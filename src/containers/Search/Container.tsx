@@ -1,6 +1,5 @@
 import React from 'react';
-import SearchInput from "./SearchInput";
-import SearchResult from "./SearchResult";
+import Presenter from './Presenter';
 
 interface Producet {
   name: string
@@ -38,7 +37,12 @@ class Search extends React.Component<any, State> {
     * 1. 현재 검색 키워드를 가져온다.
     * 2. 상품 목록에서 상품명을 조회한다.
     * 3. 포함되는 상품들을 가져온다.
-    * */
+    * *
+
+
+    *
+    * /
+     */
 
     const { keyword, product } = this.state;
 
@@ -63,18 +67,10 @@ class Search extends React.Component<any, State> {
 
   render() {
     return (
-      <div className="search-wrapper">
-        <header className="search-header">
-          <h1>검색</h1>
-        </header>
-        <main className="search-main">
-          <SearchInput
-            onChangeInput={this.handleChangeInput}
-            onKeyPress={this.handleKeyPress}
-          />
-          <SearchResult />
-        </main>
-      </div>
+      <Presenter
+        onKeyPress={this.handleKeyPress}
+        onChangeInput={this.handleChangeInput}
+      />
     )
   }
 }
