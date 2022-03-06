@@ -1,16 +1,26 @@
 import React from 'react';
-import Presenter from './Presenter';
+import SearchInput from "../../components/SearchInput";
+import SearchResult from "../../SearchResult";
 
-interface Producet {
+export type ProducetList = Array<{
   name: string
-}
+}>
 
-export type ProducetList = Array<Producet>
+export const TAB_ID = {
+  RECOMMEND: 'recommend',
+  LATELY: 'lately'
+} as const;
+
+export type TAB_TYPE = typeof TAB_ID[keyof typeof TAB_ID];
+
+export type SearchTab = Array<{ id: TAB_TYPE, title: string }>
 
 export interface State {
   keyword: string
   product: ProducetList
   searchedList: ProducetList
+  searchTab: SearchTab
+  selectedTabId: TAB_TYPE
 }
 
 class Search extends React.Component<any, State> {
@@ -30,7 +40,12 @@ class Search extends React.Component<any, State> {
           name: '햄버거'
         },
       ],
-      searchedList: []
+      searchedList: [],
+      searchTab: [
+        { id: TAB_ID.RECOMMEND, title: '추천 검색어' },
+        { id: TAB_ID.LATELY, title: '최근 검색어' },
+      ],
+      selectedTabId: TAB_ID.RECOMMEND
     }
   }
 
@@ -41,7 +56,6 @@ class Search extends React.Component<any, State> {
     * 3. 포함되는 상품들을 가져온다.
     * *
      */
-
     const { keyword, product } = this.state;
 
     const filtered = product.filter(({ name }) => name.includes(keyword));
@@ -74,17 +88,40 @@ class Search extends React.Component<any, State> {
     });
   }
 
+  handleTabClick = (id: TAB_TYPE) => {
+    debugger
+    /*
+    * 1. 현재 tabIndex를 바꾼다.
+    * 2.
+    *
+    * */
+
+    this.setState({ selectedTabId: id });
+  }
 
   render() {
-    const { keyword, searchedList } = this.state;
+    const { keyword, searchedList, searchTab, selectedTabId } = this.state;
+
     return (
-      <Presenter
-        value={keyword}
-        searchedList={searchedList}
-        onKeyPress={this.handleKeyPress}
-        onChangeInput={this.handleChangeInput}
-        onClear={this.handleClearPress}
-      />
+      <div className="search-wrapper">
+        <header className="search-header">
+          <h1>검색</h1>
+        </header>
+        <main className="search-main">
+          <SearchInput
+            value={keyword}
+            onChangeInput={this.handleChangeInput}
+            onClear={this.handleClearPress}
+            onKeyPress={this.handleKeyPress}
+          />
+          <SearchResult
+            searchTab={searchTab}
+            searchedList={searchedList}
+            selectedTabId={selectedTabId}
+            onTabClick={this.handleTabClick}
+          />
+        </main>
+      </div>
     )
   }
 }
