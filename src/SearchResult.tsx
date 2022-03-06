@@ -19,6 +19,7 @@ interface Props {
   searchedList: ProducetList
   searchTab: SearchTab
   selectedTabId: TAB_TYPE,
+  isNotFound: Boolean
   onTabClick: (id: TAB_TYPE) => void
 }
 
@@ -26,39 +27,47 @@ const SearchResult:React.FC<Props> = ({
   searchedList,
   searchTab,
   selectedTabId,
+  isNotFound,
   onTabClick,
 }) => {
+  /*
+  * 1. 검색을 하지 않은경우
+  * 2. 검색 함 && 검색 결과 없음
+  * 3. 검색 함 && 검색 결과 있음
+  * */
   return (
     <section className="search-result">
       {
-        !!searchedList.length
-          ? (
-            <ul>
-              {searchedList.map((producet, index) => (
-                <li key={`${producet.name}-${index}`}>{producet.name}</li>
-              ))}
-            </ul>
-          )
-          : (
-            <>
-              <ul className="search-tab">
-                {searchTab.map(({ id, title }) => (
-                  <button
-                    key={id}
-                    className={`${id} ${selectedTabId === id ? 'active' : ''}`}
-                    onClick={() => onTabClick(id)}
-                  >
-                    {title}
-                  </button>
+        isNotFound
+          ? <div>검색 결과 없음</div>
+          : !!searchedList.length
+            ? (
+              <ul className="search-list">
+                {searchedList.map((producet, index) => (
+                  <li key={`${producet.name}-${index}`}>{producet.name}</li>
                 ))}
               </ul>
-              <ul className="search-list">
-                <li>1. 샐러드</li>
-                <li>2. 커리</li>
-                <li>3. 햄버거</li>
-              </ul>
-            </>
-          )
+            )
+            : (
+              <>
+                <ul className="search-tab">
+                  {searchTab.map(({ id, title }) => (
+                    <button
+                      key={id}
+                      className={`${id} ${selectedTabId === id ? 'active' : ''}`}
+                      onClick={() => onTabClick(id)}
+                    >
+                      {title}
+                    </button>
+                  ))}
+                </ul>
+                <ul className="search-list">
+                  <li>1. 샐러드</li>
+                  <li>2. 커리</li>
+                  <li>3. 햄버거</li>
+                </ul>
+              </>
+            )
       }
 
     </section>

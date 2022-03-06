@@ -21,6 +21,7 @@ export interface State {
   searchedList: ProducetList
   searchTab: SearchTab
   selectedTabId: TAB_TYPE
+  isNotFound: Boolean
 }
 
 class Search extends React.Component<any, State> {
@@ -45,22 +46,33 @@ class Search extends React.Component<any, State> {
         { id: TAB_ID.RECOMMEND, title: '추천 검색어' },
         { id: TAB_ID.LATELY, title: '최근 검색어' },
       ],
-      selectedTabId: TAB_ID.RECOMMEND
+      selectedTabId: TAB_ID.RECOMMEND,
+      isNotFound: false,
     }
   }
 
   searchKeyword = () => {
-    /*
-    * 1. 현재 검색 키워드를 가져온다.
-    * 2. 상품 목록에서 상품명을 조회한다.
-    * 3. 포함되는 상품들을 가져온다.
-    * *
-     */
     const { keyword, product } = this.state;
+
+    // 1. keyword가 없는 상태에서 검색 할 경우 -> 검색 결과/검색 상태 초기화.
+    if (!keyword.length) {
+      this.setState({
+        searchedList: [],
+        isNotFound: false
+      });
+      return;
+    }
 
     const filtered = product.filter(({ name }) => name.includes(keyword));
 
-    this.setState({ searchedList: filtered });
+    // 2. keyword 있는 상태 && 검색 결과 없음 -> 결과 없음 상태 처리
+    if (!filtered.length) {
+      this.setState({ isNotFound: true });
+      return;
+    }
+
+    // 3. keyword 있음 && 검색 결과 있음 -> 검색 결과/검색 상태 처리
+    this.setState({ searchedList: filtered, isNotFound: false });
   }
 
   handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,18 +101,11 @@ class Search extends React.Component<any, State> {
   }
 
   handleTabClick = (id: TAB_TYPE) => {
-    debugger
-    /*
-    * 1. 현재 tabIndex를 바꾼다.
-    * 2.
-    *
-    * */
-
     this.setState({ selectedTabId: id });
   }
 
   render() {
-    const { keyword, searchedList, searchTab, selectedTabId } = this.state;
+    const { keyword, searchedList, searchTab, selectedTabId, isNotFound } = this.state;
 
     return (
       <div className="search-wrapper">
@@ -118,6 +123,7 @@ class Search extends React.Component<any, State> {
             searchTab={searchTab}
             searchedList={searchedList}
             selectedTabId={selectedTabId}
+            isNotFound={isNotFound}
             onTabClick={this.handleTabClick}
           />
         </main>
