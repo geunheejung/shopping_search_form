@@ -5,23 +5,28 @@ import React from 'react';
 * */
 
 export interface Props {
+  value: string
   onChangeInput: (e: React.ChangeEvent<HTMLInputElement>) => void
   onKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  onClear: (e: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 const SearchInput: React.FC<Props> = ({
+  value,
   onChangeInput,
   onKeyPress,
+  onClear,
 }) => {
   return (
     <section className="search-form">
       <input
         type="text"
         placeholder="검색어를 입력하세요"
+        value={value}
         onChange={onChangeInput}
         onKeyPress={onKeyPress}
       />
-      <span>X</span>
+      <button onClick={onClear}>X</button>
     </section>
   )
 }

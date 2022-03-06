@@ -2,10 +2,14 @@ import React from 'react';
 import SearchInput from "../../components/SearchInput";
 import SearchResult from "../../SearchResult";
 import { Props as InputProps } from "../../components/SearchInput";
+import {ProducetList} from "./Container";
 
-interface Props extends InputProps {}
+interface Props extends InputProps {
+  searchedList: ProducetList
+}
 
 const Presenter:React.FC<Props> = ({
+  searchedList,
   ...inputProps
 }) => (
   <div className="search-wrapper">
@@ -16,7 +20,9 @@ const Presenter:React.FC<Props> = ({
       <SearchInput
         {...inputProps}
       />
-      <SearchResult />
+      <SearchResult
+        searchedList={searchedList}
+      />
     </main>
   </div>
 )

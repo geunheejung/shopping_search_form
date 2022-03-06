@@ -5,10 +5,12 @@ interface Producet {
   name: string
 }
 
-interface State {
+export type ProducetList = Array<Producet>
+
+export interface State {
   keyword: string
-  product: Array<Producet>
-  result: Array<Producet>
+  product: ProducetList
+  searchedList: ProducetList
 }
 
 class Search extends React.Component<any, State> {
@@ -28,7 +30,7 @@ class Search extends React.Component<any, State> {
           name: '햄버거'
         },
       ],
-      result: []
+      searchedList: []
     }
   }
 
@@ -38,17 +40,13 @@ class Search extends React.Component<any, State> {
     * 2. 상품 목록에서 상품명을 조회한다.
     * 3. 포함되는 상품들을 가져온다.
     * *
-
-
-    *
-    * /
      */
 
     const { keyword, product } = this.state;
 
     const filtered = product.filter(({ name }) => name.includes(keyword));
 
-    this.setState({ result: filtered });
+    this.setState({ searchedList: filtered });
   }
 
   handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,12 +62,28 @@ class Search extends React.Component<any, State> {
     this.searchKeyword();
   }
 
+  handleClearPress = (e: React.MouseEvent<HTMLButtonElement>) => {
+    /*
+    * 1. 현재 검색 키워드를 초기화한다.
+    * 2. 현재 검색 결과를 초기화한다.
+    * */
+
+    this.setState({
+      keyword: '',
+      searchedList: []
+    });
+  }
+
 
   render() {
+    const { keyword, searchedList } = this.state;
     return (
       <Presenter
+        value={keyword}
+        searchedList={searchedList}
         onKeyPress={this.handleKeyPress}
         onChangeInput={this.handleChangeInput}
+        onClear={this.handleClearPress}
       />
     )
   }
