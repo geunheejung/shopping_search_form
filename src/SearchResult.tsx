@@ -2,7 +2,8 @@ import React from 'react';
 import {
   ProducetList,
   SearchTab,
-  TAB_TYPE
+  TAB_TYPE,
+  View
 } from "./containers/Search/Container";
 
 /*
@@ -18,8 +19,9 @@ import {
 interface Props {
   searchedList: ProducetList
   searchTab: SearchTab
-  selectedTabId: TAB_TYPE,
+  selectedTabId: TAB_TYPE
   isNotFound: Boolean
+  recommendList: Array<View>,
   onTabClick: (id: TAB_TYPE) => void
 }
 
@@ -28,6 +30,7 @@ const SearchResult:React.FC<Props> = ({
   searchTab,
   selectedTabId,
   isNotFound,
+  recommendList,
   onTabClick,
 }) => {
   /*
@@ -62,9 +65,11 @@ const SearchResult:React.FC<Props> = ({
                   ))}
                 </ul>
                 <ul className="search-list">
-                  <li>1. 샐러드</li>
-                  <li>2. 커리</li>
-                  <li>3. 햄버거</li>
+                  {recommendList.map(({ name, id , view}, index) => {
+                    return (
+                      <li key={id}>{`${index + 1}. ${name} - 조회수: ${view}`}</li>
+                    )
+                  })}
                 </ul>
               </>
             )

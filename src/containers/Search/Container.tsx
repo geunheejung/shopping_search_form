@@ -1,8 +1,12 @@
 import React from 'react';
+import _cloneDeep from 'lodash/cloneDeep';
+import _isEmpty from 'lodash/isEmpty';
+import _sortBy from 'lodash/sortBy';
 import SearchInput from "../../components/SearchInput";
 import SearchResult from "../../SearchResult";
 
 export type ProducetList = Array<{
+  id: string
   name: string
 }>
 
@@ -15,6 +19,16 @@ export type TAB_TYPE = typeof TAB_ID[keyof typeof TAB_ID];
 
 export type SearchTab = Array<{ id: TAB_TYPE, title: string }>
 
+export type View = {
+  id: string,
+  view: number
+  name: string
+}
+
+interface IViews {
+  [id: string]: View
+}
+
 export interface State {
   keyword: string
   product: ProducetList
@@ -22,6 +36,7 @@ export interface State {
   searchTab: SearchTab
   selectedTabId: TAB_TYPE
   isNotFound: Boolean
+  views: IViews
 }
 
 class Search extends React.Component<any, State> {
@@ -32,23 +47,36 @@ class Search extends React.Component<any, State> {
       keyword: '',
       product: [
         {
+          id: 'salady',
           name: '샐러드'
         },
         {
+          id: 'curry',
           name: '커리'
         },
         {
+          id: 'burger',
           name: '햄버거'
         },
       ],
       searchedList: [],
       searchTab: [
-        { id: TAB_ID.RECOMMEND, title: '추천 검색어' },
-        { id: TAB_ID.LATELY, title: '최근 검색어' },
+        {id: TAB_ID.RECOMMEND, title: '추천 검색어'},
+        {id: TAB_ID.LATELY, title: '최근 검색어'},
       ],
       selectedTabId: TAB_ID.RECOMMEND,
       isNotFound: false,
+      views: {}
     }
+  }
+
+  getRecommendList = () => {
+    const { views } = this.state;
+    if (_isEmpty(views)) return [];
+
+    const recommendList = _sortBy(Object.values(views), ({ view }) => view).reverse();
+
+    return recommendList;
   }
 
   searchKeyword = () => {
@@ -71,8 +99,27 @@ class Search extends React.Component<any, State> {
       return;
     }
 
+    const getViews = () => {
+      const { views } = this.state;
+      const _views: IViews = _cloneDeep(views);
+
+      for (const { id, name } of filtered) {
+        _views[id] = {
+          id,
+          view: views[id] ? views[id].view + 1 : 1,
+          name
+        }
+      }
+
+      return _views;
+    }
+
     // 3. keyword 있음 && 검색 결과 있음 -> 검색 결과/검색 상태 처리
-    this.setState({ searchedList: filtered, isNotFound: false });
+    this.setState({
+      searchedList: filtered,
+      isNotFound: false,
+      views: getViews()
+    });
   }
 
   handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,7 +152,13 @@ class Search extends React.Component<any, State> {
   }
 
   render() {
-    const { keyword, searchedList, searchTab, selectedTabId, isNotFound } = this.state;
+    const {
+      keyword,
+      searchedList,
+      searchTab,
+      selectedTabId,
+      isNotFound,
+    } = this.state;
 
     return (
       <div className="search-wrapper">
@@ -124,6 +177,7 @@ class Search extends React.Component<any, State> {
             searchedList={searchedList}
             selectedTabId={selectedTabId}
             isNotFound={isNotFound}
+            recommendList={this.getRecommendList()}
             onTabClick={this.handleTabClick}
           />
         </main>
