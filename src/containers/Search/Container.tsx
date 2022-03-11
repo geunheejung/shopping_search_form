@@ -37,6 +37,7 @@ export interface State {
   selectedTabId: TAB_TYPE
   isNotFound: Boolean
   views: IViews
+  lately: Array<string>
 }
 
 class Search extends React.Component<any, State> {
@@ -66,7 +67,8 @@ class Search extends React.Component<any, State> {
       ],
       selectedTabId: TAB_ID.RECOMMEND,
       isNotFound: false,
-      views: {}
+      views: {},
+      lately: []
     }
   }
 
@@ -77,6 +79,30 @@ class Search extends React.Component<any, State> {
     const recommendList = _sortBy(Object.values(views), ({ view }) => view).reverse();
 
     return recommendList;
+  }
+
+  getViews = (filtered: ProducetList) => {
+    const { views } = this.state;
+    const _views: IViews = _cloneDeep(views);
+
+    for (const { id, name } of filtered) {
+      _views[id] = {
+        id,
+        view: views[id] ? views[id].view + 1 : 1,
+        name
+      }
+    }
+
+    return _views;
+  }
+
+  setLately = (keyword: string) => {
+    const { lately } = this.state;
+    const result = [keyword, ...lately]
+
+    if (lately.length >= 3) result.pop();
+
+    this.setState({ lately: result });
   }
 
   searchKeyword = () => {
@@ -93,32 +119,19 @@ class Search extends React.Component<any, State> {
 
     const filtered = product.filter(({ name }) => name.includes(keyword));
 
+    this.setLately(keyword);
+
     // 2. keyword 있는 상태 && 검색 결과 없음 -> 결과 없음 상태 처리
     if (!filtered.length) {
       this.setState({ isNotFound: true });
       return;
     }
 
-    const getViews = () => {
-      const { views } = this.state;
-      const _views: IViews = _cloneDeep(views);
-
-      for (const { id, name } of filtered) {
-        _views[id] = {
-          id,
-          view: views[id] ? views[id].view + 1 : 1,
-          name
-        }
-      }
-
-      return _views;
-    }
-
     // 3. keyword 있음 && 검색 결과 있음 -> 검색 결과/검색 상태 처리
     this.setState({
       searchedList: filtered,
       isNotFound: false,
-      views: getViews()
+      views: this.getViews(filtered),
     });
   }
 
@@ -158,6 +171,7 @@ class Search extends React.Component<any, State> {
       searchTab,
       selectedTabId,
       isNotFound,
+      lately
     } = this.state;
 
     return (
@@ -178,6 +192,7 @@ class Search extends React.Component<any, State> {
             selectedTabId={selectedTabId}
             isNotFound={isNotFound}
             recommendList={this.getRecommendList()}
+            lately={lately}
             onTabClick={this.handleTabClick}
           />
         </main>

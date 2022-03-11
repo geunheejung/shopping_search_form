@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   ProducetList,
-  SearchTab,
+  SearchTab, TAB_ID,
   TAB_TYPE,
   View
 } from "./containers/Search/Container";
@@ -21,7 +21,8 @@ interface Props {
   searchTab: SearchTab
   selectedTabId: TAB_TYPE
   isNotFound: Boolean
-  recommendList: Array<View>,
+  recommendList: Array<View>
+  lately: Array<string>
   onTabClick: (id: TAB_TYPE) => void
 }
 
@@ -31,13 +32,32 @@ const SearchResult:React.FC<Props> = ({
   selectedTabId,
   isNotFound,
   recommendList,
+  lately,
   onTabClick,
 }) => {
-  /*
-  * 1. 검색을 하지 않은경우
-  * 2. 검색 함 && 검색 결과 없음
-  * 3. 검색 함 && 검색 결과 있음
-  * */
+  const renderRecommendList = () => (
+    recommendList.map(({ name, id , view}, index) => {
+      return (
+        <li key={id}>{`${index + 1}. ${name} - 조회수: ${view}`}</li>
+      )
+    })
+  );
+
+  const renderLatelyList = () => (
+    lately.map((name, index) => (
+      <li key={`${name}-${index}`}>{`${index + 1}. ${name}`}</li>
+    ))
+  )
+
+  const renderTab = () => {
+    switch (selectedTabId) {
+      case TAB_ID.RECOMMEND: return renderRecommendList()
+      case TAB_ID.LATELY: return renderLatelyList();
+      default:
+        return;
+    }
+  }
+
   return (
     <section className="search-result">
       {
@@ -65,11 +85,7 @@ const SearchResult:React.FC<Props> = ({
                   ))}
                 </ul>
                 <ul className="search-list">
-                  {recommendList.map(({ name, id , view}, index) => {
-                    return (
-                      <li key={id}>{`${index + 1}. ${name} - 조회수: ${view}`}</li>
-                    )
-                  })}
+                  {renderTab()}
                 </ul>
               </>
             )
